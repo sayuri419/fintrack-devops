@@ -11,7 +11,8 @@ module.exports = function requireAuth(req, res, next) {
     return next(unauthorized('Missing bearer token'));
   }
   try {
-    const payload = jwt.verify(token, config.jwtSecret);
+    // Pin the algorithm so a token signed with 'none' or RS/HS confusion is rejected (GHSA-qwph-4952-7xr6).
+    const payload = jwt.verify(token, config.jwtSecret, { algorithms: ['HS256'] });
     req.user = { id: payload.sub, email: payload.email };
     return next();
   } catch {

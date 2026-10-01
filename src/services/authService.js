@@ -14,7 +14,7 @@ function publicUser(user) {
 }
 
 function issueToken(user) {
-  return jwt.sign({ sub: user.id, email: user.email }, config.jwtSecret, { expiresIn: config.jwtExpiresIn });
+  return jwt.sign({ sub: user.id, email: user.email }, config.jwtSecret, { algorithm: 'HS256', expiresIn: config.jwtExpiresIn });
 }
 
 async function register({ email, password, name }) {

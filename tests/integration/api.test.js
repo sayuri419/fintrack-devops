@@ -163,3 +163,13 @@ describe('FinTrack API (integration)', () => {
     });
   });
 });
+
+describe('JWT hardening', () => {
+  beforeEach(() => resetChaos());
+
+  test('a token signed with alg "none" is rejected', async () => {
+    const jwt = require('jsonwebtoken');
+    const forged = jwt.sign({ sub: 'attacker', email: 'evil@example.com' }, null, { algorithm: 'none' });
+    await request(app).get('/api/v1/transactions').set('Authorization', `Bearer ${forged}`).expect(401);
+  });
+});
