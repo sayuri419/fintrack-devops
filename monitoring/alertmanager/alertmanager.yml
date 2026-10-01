@@ -1,0 +1,34 @@
+route:
+  receiver: oncall-webhook
+  group_by: [alertname, severity]
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 1h
+  routes:
+    - matchers: [severity="critical"]
+      receiver: oncall-webhook
+      continue: true
+    - matchers: [severity="critical"]
+      receiver: oncall-email
+
+receivers:
+  - name: oncall-webhook
+    webhook_configs:
+      - url: http://alert-logger:5001/webhook
+        send_resolved: true
+
+  # Optional email channel. Replace the placeholders with a Gmail app password
+  # (or any SMTP relay) to receive critical alerts by email as well.
+  - name: oncall-email
+    email_configs:
+      - to: your.email@example.com
+        from: fintrack-alerts@example.com
+        smarthost: smtp.gmail.com:587
+        auth_username: your.email@example.com
+        auth_password: CHANGE_ME_APP_PASSWORD
+        send_resolved: true
+
+inhibit_rules:
+  - source_matchers: [alertname="FinTrackDown"]
+    target_matchers: [severity="warning"]
+    equal: [team]

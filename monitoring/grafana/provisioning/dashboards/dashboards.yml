@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: fintrack
+    folder: FinTrack
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards

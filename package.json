@@ -1,0 +1,41 @@
+{
+  "name": "fintrack-api",
+  "version": "1.2.0",
+  "description": "FinTrack - personal finance and budgeting REST API used to demonstrate a full Jenkins DevOps pipeline",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "build": "node scripts/build-info.js",
+    "lint": "eslint src tests",
+    "lint:report": "eslint src tests -f json -o reports/eslint-report.json",
+    "test": "jest",
+    "test:unit": "jest --selectProjects unit",
+    "test:integration": "jest --selectProjects integration",
+    "test:ci": "jest --ci --coverage --reporters=default --reporters=jest-junit",
+    "audit:ci": "npm audit --omit=dev --json > reports/npm-audit.json || true"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "joi": "^18.2.9",
+    "jsonwebtoken": "^8.5.1",
+    "pino": "^10.3.1",
+    "pino-http": "^11.0.0",
+    "prom-client": "^15.1.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.11.0",
+    "globals": "^17.13.0",
+    "jest": "^30.5.2",
+    "jest-junit": "^17.0.0",
+    "supertest": "^7.3.0"
+  }
+}

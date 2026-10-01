@@ -1,0 +1,24 @@
+# Staging (test) environment - deployed automatically by the Jenkins "Deploy" stage.
+name: fintrack-staging
+services:
+  api:
+    image: ${IMAGE_REPO:-localhost:5000/fintrack-api}:${IMAGE_TAG:?IMAGE_TAG is required}
+    container_name: fintrack-staging
+    env_file: .env.staging
+    environment:
+      NODE_ENV: production
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      CHAOS_TOKEN: ${CHAOS_TOKEN:-staging-chaos}
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+    networks: [devops-net]
+    labels:
+      com.fintrack.environment: staging
+    deploy:
+      resources:
+        limits: { cpus: "0.50", memory: 256M }
+
+networks:
+  devops-net:
+    external: true

@@ -1,0 +1,3 @@
+# Accepted risks must be listed with a reason and review date.
+# Format: <CVE-ID>  # reason, owner, review-by date
+# (empty = no accepted risks at the moment)

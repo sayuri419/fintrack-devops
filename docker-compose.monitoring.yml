@@ -1,0 +1,41 @@
+# Monitoring stack: Prometheus (metrics + alert rules), Alertmanager (routing),
+# Grafana (dashboards) and a small webhook receiver that logs every alert.
+# Config files are baked into images so this works when Jenkins drives the
+# host Docker daemon through the mounted socket.
+name: fintrack-monitoring
+services:
+  prometheus:
+    build: ./monitoring/prometheus
+    container_name: prometheus
+    ports: ["9090:9090"]
+    networks: [devops-net]
+    restart: unless-stopped
+
+  alertmanager:
+    build: ./monitoring/alertmanager
+    container_name: alertmanager
+    ports: ["9093:9093"]
+    networks: [devops-net]
+    restart: unless-stopped
+
+  grafana:
+    build: ./monitoring/grafana
+    container_name: grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports: ["3030:3000"]
+    networks: [devops-net]
+    restart: unless-stopped
+
+  alert-logger:
+    build: ./monitoring/alert-logger
+    container_name: alert-logger
+    ports: ["5001:5001"]
+    networks: [devops-net]
+    restart: unless-stopped
+
+networks:
+  devops-net:
+    external: true

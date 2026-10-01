@@ -1,0 +1,11 @@
+node_modules
+coverage
+reports
+tests
+.git
+.scannerwork
+*.md
+Jenkinsfile
+jenkins
+monitoring
+artifacts

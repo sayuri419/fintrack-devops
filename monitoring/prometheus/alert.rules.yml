@@ -1,0 +1,37 @@
+groups:
+  - name: fintrack-production
+    rules:
+      - alert: FinTrackDown
+        expr: up{job="fintrack-prod"} == 0
+        for: 30s
+        labels: { severity: critical, team: fintrack }
+        annotations:
+          summary: "FinTrack production is down"
+          description: "Prometheus cannot scrape fintrack-prod for more than 30 seconds."
+
+      - alert: FinTrackHighErrorRate
+        expr: |
+          sum(rate(fintrack_http_requests_total{job="fintrack-prod",status=~"5.."}[1m]))
+            / clamp_min(sum(rate(fintrack_http_requests_total{job="fintrack-prod"}[1m])), 0.001) > 0.05
+        for: 30s
+        labels: { severity: critical, team: fintrack }
+        annotations:
+          summary: "More than 5% of production requests are failing"
+          description: "5xx ratio is {{ $value | humanizePercentage }} over the last minute."
+
+      - alert: FinTrackHighLatency
+        expr: |
+          histogram_quantile(0.95, sum(rate(fintrack_http_request_duration_seconds_bucket{job="fintrack-prod"}[5m])) by (le)) > 0.5
+        for: 2m
+        labels: { severity: warning, team: fintrack }
+        annotations:
+          summary: "p95 latency above 500ms"
+          description: "95th percentile latency is {{ $value }}s."
+
+      - alert: FinTrackHighMemory
+        expr: fintrack_process_resident_memory_bytes{job="fintrack-prod"} > 400 * 1024 * 1024
+        for: 5m
+        labels: { severity: warning, team: fintrack }
+        annotations:
+          summary: "Production memory above 400MB (limit 512MB)"
+          description: "Resident memory is {{ $value | humanize1024 }}B."

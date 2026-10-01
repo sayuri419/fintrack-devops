@@ -1,0 +1,49 @@
+# Local DevOps lab: Jenkins, SonarQube and a private Docker registry.
+# Start with:  docker compose -f jenkins/docker-compose.yml up -d --build
+name: devops-lab
+services:
+  jenkins:
+    build: .
+    container_name: jenkins
+    user: root            # lab only: lets Jenkins use the host Docker socket
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks: [devops-net]
+    restart: unless-stopped
+
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_extensions:/opt/sonarqube/extensions
+    networks: [devops-net]
+    restart: unless-stopped
+
+  registry:
+    image: registry:2
+    container_name: registry
+    ports:
+      - "5000:5000"
+    volumes:
+      - registry_data:/var/lib/registry
+    networks: [devops-net]
+    restart: unless-stopped
+
+volumes:
+  jenkins_home:
+  sonar_data:
+  sonar_extensions:
+  registry_data:
+
+networks:
+  devops-net:
+    name: devops-net
